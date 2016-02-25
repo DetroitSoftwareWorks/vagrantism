@@ -1,0 +1,30 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "dummy"
+  # config.vm.synced_folder "backups/", "/bak"
+  # config.vm.synced_folder "vagrant/", "/vagrant"
+
+  config.vm.provider :aws do |aws, override|
+    aws.access_key_id = "<Your AWS access key id>"
+    aws.secret_access_key = "<Your AWS access key>"
+    # aws.session_token = "SESSION TOKEN"
+    aws.keypair_name = "<Your AWS access keypair name>"
+    aws.security_groups = [ "<group1>", "<group2>" ]
+
+	#    aws.ami = "ami-7388cd19"
+    aws.ami = "ami-0ee1c464"
+    aws.instance_type = "t2.micro"
+
+    override.ssh.username = "ubuntu"
+    override.ssh.private_key_path = "/path/to/your/yourKey.pem"
+  end
+
+  config.vm.provision "shell", path: "../public_scripts/os-updates.sh"
+  config.vm.provision "shell", path: "../public_scripts/backups.sh"
+  config.vm.provision "shell", path: "../public_scripts/git.sh"
+
+  config.vm.provision "shell", inline: <<-SHELL
+  	ls -lathr /bak/
+  	reboot
+  SHELL
+  
+end
