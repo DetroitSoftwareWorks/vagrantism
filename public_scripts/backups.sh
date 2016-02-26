@@ -3,10 +3,24 @@
 BACKUP_SCRIPT=/usr/local/bin/runBackup.sh
 PATHS_TO_BACKUP=/bak/pathsToBackup
 CRONFILE=cronfile
+INSTALLED_PKGS_LIST=/bak/installedPackages
+TMP_CRONFILE=cronfile
 
+# 1 - HERE doc for ${BACKUP_SCRIPT}
+# cp /bak/runBackup.sh /usr/local/bin/
 (
 cat <<-XXXEOFXXX
 	#!/bin/bash
+
+	crontab -l > /bak/cronfile
+	aptitude search '~i .*' > ${INSTALLED_PKGS_LIST}
+
+	# Run scripts in /etc/backups.d
+	for SCRIPT in /etc/backups.d/*
+	do
+		echo ${SCRIPT}
+		${SCRIPT}
+	done
 
 	# This should be kept as last step
 	if [ -e ${PATHS_TO_BACKUP} ]
@@ -15,30 +29,20 @@ cat <<-XXXEOFXXX
 	fi
 XXXEOFXXX
 ) > ${BACKUP_SCRIPT}
-
 chmod u+x ${BACKUP_SCRIPT}
 
+# Add ${BACKUP_SCRIPT} to the list of files to backup
+if [ ! $(grep ^${BACKUP_SCRIPT}$ ${FILE_FOR_BACKUP_PATHS}) ]
+then
+	echo "${BACKUP_SCRIPT}" >> ${FILE_FOR_BACKUP_PATHS}
+fi
 
-crontab -l -u root > ${CRONFILE}
+# Setup a crontab for calling ${BACKUP_SCRIPT}
+crontab -l -u root > ${TMP_CRONFILE}
 
-# Setup backups
-LINES_LIST=("${BACKUP_SCRIPT}")
-
-for I in "${LINES_LIST[@]}"
-do
-	grep -qs "${I}" "${CRONFILE}"
-	GREP_RESULT=$?	# grep command returns 0 (true) if line exists in cron
-	echo ${GREP_RESULT}
-	if [ ${GREP_RESULT} -eq 0 ] 
-	then 
-		echo "${I} already invoked in root's cron--no action taken"
-	else
-		echo -e "0 2 * * *	${I}" >> ${CRONFILE}
-	fi
-done
-
-echo -e "\nDisplaying root's crontab\n"
-cat ${CRONFILE}
-
-crontab -u root ${CRONFILE}
-rm -Rf ${CRONFILE}
+if [ ! $(grep "^0 2 \* \* \*	${BACKUP_SCRIPT}$" ${TMP_CRONFILE}) ]
+then
+	echo "0 2 * * *	${BACKUP_SCRIPT}" >> ${TMP_CRONFILE}
+fi
+crontab -u root ${TMP_CRONFILE}
+rm -Rf ${TMP_CRONFILE}
