@@ -18,23 +18,25 @@ cat <<-XXXEOFXXX
 	# Run scripts in /etc/backups.d
 	for SCRIPT in /etc/backups.d/*
 	do
-		echo ${SCRIPT}
-		${SCRIPT}
+	    echo \${SCRIPT}
+	    \${SCRIPT}
 	done
 
 	# This should be kept as last step
 	if [ -e ${PATHS_TO_BACKUP} ]
 	then
-		tar czvf /bak/$(hostname).tgz -T ${PATHS_TO_BACKUP} ${PATHS_TO_BACKUP}
+	    tar czvf /bak/$(hostname).tgz -T ${PATHS_TO_BACKUP} ${PATHS_TO_BACKUP}
 	fi
 XXXEOFXXX
 ) > ${BACKUP_SCRIPT}
 chmod u+x ${BACKUP_SCRIPT}
 
+mkdir -p /etc/backups.d
+
 # Add ${BACKUP_SCRIPT} to the list of files to backup
-if [ ! $(grep ^${BACKUP_SCRIPT}$ ${FILE_FOR_BACKUP_PATHS}) ]
+if [ ! $(grep ^${BACKUP_SCRIPT}$ ${PATHS_TO_BACKUP}) ]
 then
-	echo "${BACKUP_SCRIPT}" >> ${FILE_FOR_BACKUP_PATHS}
+	echo "${BACKUP_SCRIPT}" >> ${PATHS_TO_BACKUP}
 fi
 
 # Setup a crontab for calling ${BACKUP_SCRIPT}
