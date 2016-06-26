@@ -18,7 +18,3 @@ cat <<-XXXEOFXXX
 XXXEOFXXX
 ) > ${PROFILE_SCRIPT}
 fi
-
-# get up-to-date
-aptitude update
-aptitude -y safe-upgrade

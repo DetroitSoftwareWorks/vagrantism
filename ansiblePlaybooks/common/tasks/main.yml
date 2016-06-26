@@ -1,0 +1,13 @@
+---
+- name: update and upgrade all packages
+  apt: 
+    upgrade: safe 
+    update_cache: yes
+  become: true
+- name: ensure ntp is at the latest version
+  apt: 
+    pkg: ntp 
+    state: latest
+  become: true
+  notify:
+      - restart ntp
