@@ -3,3 +3,6 @@
     name: ntp
     state: restarted
   become: true
+- name: update timezone
+  command: dpkg-reconfigure --frontend noninteractive tzdata
+  become: true

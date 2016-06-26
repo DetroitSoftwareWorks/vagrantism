@@ -11,3 +11,14 @@
   become: true
   notify:
       - restart ntp
+- name: set timezone
+  copy:
+    content: 'America/Detroit'
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  become: true
+  notify:
+    - update timezone

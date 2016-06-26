@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Set up timezone
-mv /etc/timezone /etc/timezone.orig
-echo "America/Detroit" > /etc/timezone
-dpkg-reconfigure --frontend noninteractive tzdata
-
 # Set up the ${EDITOR} VAR
 PROFILE_SCRIPT=/etc/profile.d/editor.sh
 
