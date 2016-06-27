@@ -18,9 +18,15 @@ Vagrant.configure("2") do |config|
     override.ssh.private_key_path = "/path/to/your/yourKey.pem"
   end
 
-  config.vm.provision "shell", path: "../public_scripts/os-updates.sh"
   config.vm.provision "shell", path: "../public_scripts/backups.sh"
   config.vm.provision "shell", path: "../public_scripts/git.sh"
+
+  #
+  # Run Ansible from the Vagrant Host
+  #
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "../ansiblePlaybooks/site.yml"
+  end
 
   config.vm.provision "shell", inline: <<-SHELL
   	ls -lathr /bak/

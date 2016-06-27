@@ -22,3 +22,10 @@
   become: true
   notify:
     - update timezone
+- name: Set EDITOR
+  lineinfile: 
+    dest: /etc/environment 
+    state: present 
+    regexp: '^EDITOR=' 
+    line: 'EDITOR=/usr/bin/vi'
+  become: true 

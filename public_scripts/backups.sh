@@ -2,9 +2,10 @@
 
 BACKUP_SCRIPT=/usr/local/bin/runBackup.sh
 BACKUP_SUBSCRIPTS_DIR=/etc/backups.d
-CRONFILE=/bak/cronfile
-INSTALLED_PKGS_LIST=/bak/installedPackages
-PATHS_TO_BACKUP=/bak/pathsToBackup
+BAK_DIR=/bak
+CRONFILE=${BAK_DIR}/cronfile
+INSTALLED_PKGS_LIST=${BAK_DIR}/installedPackages
+PATHS_TO_BACKUP=${BAK_DIR}/pathsToBackup
 TMP_CRONFILE=cronfile
 
 # 1 - HERE doc for ${BACKUP_SCRIPT}
@@ -40,7 +41,7 @@ XXXEOFXXX
 ) > ${BACKUP_SCRIPT}
 chmod u+x ${BACKUP_SCRIPT}
 
-mkdir -p ${BACKUP_SUBSCRIPTS_DIR}
+mkdir -p ${BACKUP_SUBSCRIPTS_DIR} ${BAK_DIR}
 
 # Add ${BACKUP_SCRIPT} to the list of files to backup
 # if [ ! $(grep ^${BACKUP_SCRIPT}$ ${PATHS_TO_BACKUP}) ]
