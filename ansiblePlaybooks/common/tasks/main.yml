@@ -4,6 +4,11 @@
     upgrade: safe 
     update_cache: yes
   become: true
+- name: ensure aptitude is at the latest version
+  apt: 
+    pkg: aptitude 
+    state: latest
+  become: true
 - name: ensure ntp is at the latest version
   apt: 
     pkg: ntp 
