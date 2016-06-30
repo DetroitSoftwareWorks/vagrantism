@@ -1,7 +1,13 @@
 ---
-
 - name: apply common configuration to all nodes
   hosts: all
 
   roles:
     - common
+
+- name: install git on git client nodes
+  hosts: tag_Git_Yes
+
+  roles:
+    - git-client
+    
