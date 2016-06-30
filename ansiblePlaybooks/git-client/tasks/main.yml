@@ -1,0 +1,6 @@
+---
+- name: ensure git is at the latest version
+  apt: 
+    pkg: git 
+    state: latest
+  become: true
