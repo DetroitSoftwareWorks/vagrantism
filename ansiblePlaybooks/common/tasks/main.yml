@@ -16,21 +16,15 @@
   become: true
   notify:
       - restart ntp
-- name: set timezone
-  copy:
-    content: 'America/Detroit'
-    dest: /etc/timezone
-    owner: root
-    group: root
-    mode: 0644
-    backup: yes
-  become: true
-  notify:
-    - update timezone
 - name: Set EDITOR
   lineinfile: 
     dest: /etc/environment 
     state: present 
     regexp: '^EDITOR=' 
     line: 'EDITOR=/usr/bin/vi'
-  become: true 
+  become: true
+- include: timezone.yml
+  vars:
+    my_zone: 'America/Detroit'
+    my_abbr_1: 'EDT'
+    my_abbr_2: 'EST'

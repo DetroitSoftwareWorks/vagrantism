@@ -1,0 +1,5 @@
+---
+- name: Set timezone variables
+  when: (not ansible_date_time.tz == my_abbr_1) and (not ansible_date_time.tz == my_abbr_2)
+  shell: timedatectl set-timezone {{ my_zone }}
+  become: true
