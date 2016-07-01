@@ -24,12 +24,4 @@ Vagrant.configure(2) do |config|
     ansible.playbook = "../ansiblePlaybooks/site.yml"
   end
 
-  config.vm.provision "shell", path: "../public_scripts/backups.sh"
-  config.vm.provision "shell", path: "../public_scripts/git.sh"
-
-  config.vm.provision "shell", inline: <<-SHELL
-    ls -lathr /bak/
-    reboot
-  SHELL
-  
 end
