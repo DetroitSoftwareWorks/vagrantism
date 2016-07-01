@@ -1,21 +1,4 @@
 ---
-- name: install the backup script and the list of files to backup
-  copy: 
-    backup: true
-    src: ../files/runBackup.sh
-    dest: /usr/local/bin/runBackup.sh
-    mode: 0744
-    owner: root
-    group: root
-  become: true
-  copy: 
-    backup: true
-    src: ../files/pathsToBackup
-    dest: //bak/pathsToBackup
-    mode: 0744
-    owner: root
-    group: root
-  become: true
 - name: create the backups.d dir
   file:
     path: /etc/backups.d
@@ -31,6 +14,24 @@
     group: root
     mode: 0755
     state: directory
+  become: true
+- name: install the backup script
+  copy: 
+    backup: true
+    src: ../files/runBackup.sh
+    dest: /usr/local/bin/runBackup.sh
+    mode: 0744
+    owner: root
+    group: root
+  become: true
+- name: install the list of files to backup
+  copy: 
+    backup: true
+    src: ../files/pathsToBackup
+    dest: /bak/pathsToBackup
+    mode: 0744
+    owner: root
+    group: root
   become: true
 - name: create the cron task for backup
   cron:
