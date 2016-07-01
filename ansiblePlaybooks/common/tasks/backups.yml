@@ -1,0 +1,43 @@
+---
+- name: install the backup script and the list of files to backup
+  copy: 
+    backup: true
+    src: ../files/runBackup.sh
+    dest: /usr/local/bin/runBackup.sh
+    mode: 0744
+    owner: root
+    group: root
+  become: true
+  copy: 
+    backup: true
+    src: ../files/pathsToBackup
+    dest: //bak/pathsToBackup
+    mode: 0744
+    owner: root
+    group: root
+  become: true
+- name: create the backups.d dir
+  file:
+    path: /etc/backups.d
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  become: true
+- name: create the backup dir
+  file:
+    path: /bak
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  become: true
+- name: create the cron task for backup
+  cron:
+    state: present
+    backup: true
+    name: backup-task
+    minute: 3
+    hour: 2
+    job: /usr/local/bin/runBackup.sh
+  become: true
