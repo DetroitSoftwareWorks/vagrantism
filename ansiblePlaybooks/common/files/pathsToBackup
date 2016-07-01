@@ -1,0 +1,5 @@
+/bak/pathsToBackup
+/usr/local/bin/runBackup.sh 
+/bak/cronfile 
+/bak/installedPackages 
+/etc/backups.d
