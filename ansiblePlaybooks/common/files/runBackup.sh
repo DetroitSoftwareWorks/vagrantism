@@ -7,7 +7,7 @@ INSTALLED_PKGS_LIST=${BAK_DIR}/installedPackages
 PATHS_TO_BACKUP=${BAK_DIR}/pathsToBackup
 
 crontab -l > ${CRONFILE}
-aptitude search '~i .*' > \${INSTALLED_PKGS_LIST}
+aptitude search '~i .*' > ${INSTALLED_PKGS_LIST}
 
 # Run scripts in /etc/backups.d
 for SCRIPT in ${BACKUP_SUBSCRIPTS_DIR}/*
