@@ -1,13 +1,16 @@
 #!/bin/bash
 
-BACKUP_SUBSCRIPTS_DIR=/etc/backups.d
-BAK_DIR=/bak
-CRONFILE=${BAK_DIR}/cronfile
-INSTALLED_PKGS_LIST=${BAK_DIR}/installedPackages
-PATHS_TO_BACKUP=${BAK_DIR}/pathsToBackup
 
-crontab -l > ${CRONFILE}
-aptitude search '~i .*' > ${INSTALLED_PKGS_LIST}
+BACKUP_SUBSCRIPTS_DIR='/etc/backups.d'
+BAK_DIR='/bak'
+CRONFILE="${BAK_DIR}/cronfile"
+INSTALLED_PKGS_LIST="${BAK_DIR}/installedPackages"
+PATHS_TO_BACKUP="${BAK_DIR}/pathsToBackup"
+PATH_TO_FILE="${BAK_DIR}/$(hostname).tgz"
+FILENAME="$(basename ${PATH_TO_FILE})"
+
+/usr/bin/crontab -l > "${CRONFILE}"
+/usr/bin/aptitude search '~i .*' > "${INSTALLED_PKGS_LIST}"
 
 # Run scripts in /etc/backups.d
 for SCRIPT in ${BACKUP_SUBSCRIPTS_DIR}/*
