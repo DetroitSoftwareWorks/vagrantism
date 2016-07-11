@@ -1,4 +1,5 @@
 ---
+- include: aws-cli.yml
 - name: create the backups.d dir
   file:
     path: /etc/backups.d
