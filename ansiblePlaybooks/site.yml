@@ -4,6 +4,7 @@
 
   roles:
     - common
+    - postfix
 
 - name: install git on git client nodes
   hosts: tag_Git_Yes
