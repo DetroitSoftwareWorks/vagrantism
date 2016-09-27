@@ -1,0 +1,27 @@
+---
+- name: ensure postfix is at the latest version
+  apt: 
+    pkg: postfix 
+    state: latest
+  become: true
+  notify:
+      - restart postfix
+- name: Set Postfix option type as internet site
+  debconf: 
+    name: postfix 
+    question: "postfix/main_mailer_type" 
+    value: "'Internet Site'" 
+    vtype: "string"
+  become: true
+- name: Set Postfix option hostname
+  debconf: 
+    name: postifx 
+    question: "postfix/mailname" 
+    value: "{{ansible_fqdn}}" 
+    vtype: "string"
+  become: true
+- name: ensure mailutils is at the latest version
+  apt: 
+    pkg: mailutils
+    state: latest
+  become: true
