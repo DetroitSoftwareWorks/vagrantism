@@ -1,0 +1,30 @@
+Vagrant.configure(2) do |config|
+  
+  config.vm.box = "dummy"
+#   config.vm.synced_fo# lder "backups/", "/bak"
+#   config.vm.synced_folder "vagrant/", "/vagrant"
+
+  config.vm.provider :aws do |aws, override|
+    aws.access_key_id = ENV['AWS_ACCESS_KEY']
+    aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+    # aws.session_token = "SESSION TOKEN"
+    aws.keypair_name = "DSW.20151210"
+    aws.security_groups = [ "launch-wizard-1", "Web" ]
+
+	#    aws.ami = "ami-7388cd19"
+    aws.ami = "ami-0ee1c464"
+    aws.instance_type = "t2.micro"
+
+    override.ssh.username = "ubuntu"
+    override.ssh.private_key_path = "/Users/ben/keys/DSW20151210.pem"
+  end
+
+
+#   config.vm.provision "shell", path: "../public_scripts/xenial-workarounds.sh"
+
+  config.vm.provision "ansible" do |ansible|
+  	# ansible.playbook = "xenial-python.yml"
+    ansible.playbook = "../ansiblePlaybooks/site.yml"
+  end
+
+end

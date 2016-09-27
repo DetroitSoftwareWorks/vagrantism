@@ -1,0 +1,15 @@
+---
+- name: ensure awscli is at the latest version
+  apt: 
+    pkg: awscli 
+    state: latest
+  become: true
+- name: install the backup credentials
+  copy: 
+    backup: true
+    src: ../files/backupbotCredentials.sh
+    dest: /backupbotCredentials.sh
+    mode: 0600
+    owner: root
+    group: root
+  become: true
