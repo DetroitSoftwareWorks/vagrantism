@@ -5,8 +5,8 @@ Vagrant.configure(2) do |config|
 #   config.vm.synced_folder "vagrant/", "/vagrant"
 
   config.vm.provider :aws do |aws, override|
-    aws.access_key_id = "AKIAJUR7RAVQNX55F4WA"
-    aws.secret_access_key = "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"
+    aws.access_key_id = ENV['AWS_ACCESS_KEY']
+    aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
     # aws.session_token = "SESSION TOKEN"
     aws.keypair_name = "DSW.20151210"
     aws.security_groups = [ "launch-wizard-1", "Web" ]
