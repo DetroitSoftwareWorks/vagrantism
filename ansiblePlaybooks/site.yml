@@ -12,3 +12,14 @@
   roles:
     - git-client
     
+- name: install java on java client nodes
+  hosts: tag_Java_Yes
+
+  roles:
+    - java
+
+- name: install node on node client nodes
+  hosts: tag_Node_Yes
+
+  roles:
+    - node
