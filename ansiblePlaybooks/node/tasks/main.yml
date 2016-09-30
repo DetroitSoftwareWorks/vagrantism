@@ -1,0 +1,11 @@
+---
+- name: ensure node is at the latest version
+  apt: 
+    pkg: nodejs
+    state: latest
+  become: true
+- name: ensure npm is at the latest version
+  apt: 
+    pkg: npm
+    state: latest
+  become: true
