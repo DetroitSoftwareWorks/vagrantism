@@ -19,7 +19,7 @@ fi
 
 for ELEM in $(ls ${MAIN_DIR})
 do
-    if [[ -d ${ELEM} ]]
+    if [[ -d ${MAIN_DIR}/${ELEM} ]]
     then
         if [[ -e ${TARGET_DIR}/${ELEM} ]]
         then
