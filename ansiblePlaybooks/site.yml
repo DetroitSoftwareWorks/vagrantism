@@ -19,18 +19,18 @@
 
   roles:
     - git-client
-    
-- name: install java on java client nodes
-  hosts: tag_JRE_Yes
-
-  roles:
-    - java_jre
 
 - name: install java on java client nodes
   hosts: tag_JDK_Yes
 
   roles:
-    - java_jdk
+    - java-jdk
+    
+- name: install java on java client nodes
+  hosts: tag_JRE_Yes
+
+  roles:
+    - java-jre
 
 - name: install node on node client nodes
   hosts: tag_Node_Yes
