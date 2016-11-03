@@ -37,3 +37,9 @@
 
   roles:
     - node
+
+- name: install Swift on Swift client nodes
+  hosts: tag_Swift_Yes
+
+  roles:
+    - swift
