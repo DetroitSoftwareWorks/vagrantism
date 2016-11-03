@@ -1,0 +1,146 @@
+---
+- name: check OS version
+  set_fact: 
+    binaryPath: /tmp/swift-binary.tar.gz
+    signaturePath: /tmp/swift-signature.tar.gz.sig
+    ubuntuVersion: "{{ ansible_distribution_version }}"
+
+- name: setURL
+  set_fact: 
+    binaryTar: swift-3.0-RELEASE-ubuntu14.04.tar.gz
+  when: '"14.04" in ubuntuVersion'
+
+- name: setURL
+  set_fact: 
+    binaryURL: https://swift.org/builds/swift-3.0-release/ubuntu1404/swift-3.0-RELEASE/{{ binaryTar }}
+    swiftSystemHome: /swift/swift-3.0-RELEASE-ubuntu14.04
+    signatureURL: https://swift.org/builds/swift-3.0-release/ubuntu1404/swift-3.0-RELEASE/swift-3.0-RELEASE-ubuntu14.04.tar.gz.sig
+  when: '"14.04" in ubuntuVersion'
+
+- name: setURL
+  set_fact: 
+    binaryTar: swift-3.0-RELEASE-ubuntu15.10.tar.gz
+  when: '"15.10" in ubuntuVersion'
+
+- name: setURL
+  set_fact: 
+    binaryURL: https://swift.org/builds/swift-3.0-release/ubuntu1510/swift-3.0-RELEASE/{{ binaryTar }}
+    swiftSystemHome: /swift/swift-3.0-RELEASE-ubuntu15.10
+    signatureURL: https://swift.org/builds/swift-3.0-release/ubuntu1510/swift-3.0-RELEASE/swift-3.0-RELEASE-ubuntu15.10.tar.gz.sig
+  when: '"15.10" in ubuntuVersion'
+
+- debug: var={{ ubuntuVersion }}
+- debug: msg="Binary URL is "
+- debug: var="binaryURL"
+
+# Per instructions for Linux at https://swift.org/download/#using-downloads
+- name: check if Swift is already here
+  stat: 
+    path: "{{ swiftSystemHome }}/usr/bin/swift"
+  register: swift
+
+- debug: msg="swift isn't defined (path doesn't exist)"
+  when: not swift.stat.exists
+- debug: msg="swift is defined (path exists)"
+  when: swift.stat.exists
+
+- name: get GPG keys
+  shell: /usr/bin/gpg --list-keys 
+  become: true
+  register: keyList
+  when: not swift.stat.exists
+
+- debug: msg="swift isn't defined (path doesn't exist)"
+  when: not swift.stat.exists
+- debug: msg="swift is defined (path exists)"
+  when: swift.stat.exists
+- debug: var=keyList
+  when: not swift.stat.exists
+- debug: var=keyList.stdout
+  when: not swift.stat.exists
+- debug: msg="gpg key was found"
+  when: not swift.stat.exists and '"Swift 3" in keyList.stdout'
+- debug: msg="gpg key was not found"
+  when: not swift.stat.exists and '"Swift 3" not in keyList.stdout'
+
+- name: get key if necessary
+  get_url: 
+    url: https://swift.org/keys/release-key-swift-3.x.asc
+    dest: /tmp/swiftkey
+  when: not swift.stat.exists and ('"Swift 3.x" not in keyList.stdout')
+
+- name: install key if necessary
+  command: /usr/bin/gpg --import /tmp/swiftkey
+  when: not swift.stat.exists and ('"Swift 3.x" not in keyList.stdout')
+  become: true
+
+- name: install required dependencies - libcurl3
+  apt: 
+    pkg: libcurl3
+    state: latest
+  when: '"15.10" in ubuntuVersion'
+  become: true
+
+- name: install required dependencies - clang
+  apt: 
+    pkg: clang
+    state: latest
+  become: true
+
+- name: install required dependencies - libicu-dev
+  apt: 
+    pkg: libicu-dev
+    state: latest
+  become: true
+
+- name: get Swift binary
+  get_url:  
+    url: "{{ binaryURL }}"
+    dest: "{{ binaryPath }}"
+  when: not swift.stat.exists
+
+- name: get Swift signature
+  get_url: 
+    url: "{{ signatureURL }}"
+    dest: "{{ signaturePath }}"
+  when: not swift.stat.exists
+
+- name: refresh key revocation dates
+  shell: /usr/bin/gpg --keyserver hkp://pool.sks-keyservers.net --refresh-keys Swift
+  when: not swift.stat.exists
+  become: true
+
+- name: verify archive
+  shell: /usr/bin/gpg --verify {{ signaturePath }} {{ binaryPath }}
+  register: archiveVerified
+  when: not swift.stat.exists
+  become: true
+
+- name: create the Swift dir
+  file:
+    path: /swift
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  when: not swift.stat.exists
+  become: true
+
+- name: install Swift
+  unarchive: src={{ binaryPath }} remote_src=yes dest=/swift copy=no
+  become: true
+  when: not swift.stat.exists
+
+- name: fix inexplicable swift.org issue
+  file:
+    path: "{{ swiftSystemHome }}/usr/lib/swift/CoreFoundation/"
+    mode: o+r
+    recurse: yes
+  become: true
+
+- name: create link to current swift install
+  file:
+    path: "/swift/latest-release"
+    state: link
+    src: "{{ swiftSystemHome }}"
+  become: true
