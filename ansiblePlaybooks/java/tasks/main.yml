@@ -1,6 +1,6 @@
 ---
 - name: ensure java is at the latest version
   apt: 
-    pkg: default-jdk-headless 
+    pkg: default-jdk
     state: latest
   become: true
