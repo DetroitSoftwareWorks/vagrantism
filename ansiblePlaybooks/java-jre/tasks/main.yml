@@ -1,0 +1,6 @@
+---
+- name: ensure java is at the latest version
+  apt: 
+    pkg: default-jre-headless 
+    state: latest
+  become: true

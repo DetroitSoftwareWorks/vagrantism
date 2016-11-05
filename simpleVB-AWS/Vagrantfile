@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  if ENV['AWS_ENV'].downcase == 'dev'
+    config.vm.box = "ubuntu/trusty64"
+
+    config.ssh.insert_key = true
+
+    config.vm.box_check_update = true
+
+    config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+
+    dirname = File.basename(Dir.getwd)
+    config.vm.hostname = dirname
+
+    config.vm.provider "virtualbox" do |v|
+      v.memory = "4096"
+      v.name = config.vm.hostname
+    end
+  else
+    config.vm.provider :aws do |aws, override|
+      aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+      aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+      aws.keypair_name = ENV['AWS_KEYNAME']
+      
+      if ENV['AWS_ENV'].downcase == 'staging'
+        aws.instance_type = "t1.micro"
+      elsif ENV['AWS_ENV'].downcase == 'prod'
+        aws.instance_type = "t1.micro"
+      elsif ENV['AWS_ENV'].downcase == 'test'
+        aws.instance_type = "t1.micro"
+      else
+        aws.instance_type = "t2.nano"
+      end
+
+      aws.ami = "ami-71d91a1c"  # trusty
+
+      aws.region = "us-east-1"
+
+      override.vm.box = "dummy"
+      override.ssh.username = "ubuntu"
+      override.ssh.private_key_path = ENV['AWS_KEYPATH']
+
+      aws.tags = { 'Ansible' => 'Yes',
+                   'Node' => 'Yes',
+                   'Tier' => 'Infra',
+                   'Name' => 'dummy' }
+
+      if ENV['AWS_ENV'].downcase == 'staging'
+        aws.tags[:'AWSEnvironment'] = 'Staging'
+      elsif ENV['AWS_ENV'].downcase == 'prod'
+        aws.tags[:'AWSEnvironment'] = 'Prod'
+      elsif ENV['AWS_ENV'].downcase == 'test'
+        aws.tags[:'AWSEnvironment'] = 'Test'
+      else
+        aws.tags[:'AWSEnvironment'] = 'WRONG'
+      end
+    end
+  end
+
+  #
+  # Run Ansible from the Vagrant Host
+  #
+  config.vm.provision "ansible" do |ansible|
+    if ENV['AWS_ENV'].downcase == 'dev'
+      ansible.groups = {
+        "tag_Ansible_Yes" => ["default"]
+      }
+    else
+      ansible.inventory_path = "/usr/local/etc/ansible/hosts"
+    end
+    ansible.limit = "tag_Ansible_Yes"
+    ansible.playbook = "../ansible/site.yml"
+  end
+
+end
+

@@ -1,4 +1,12 @@
----
+- hosts: all
+  gather_facts: False
+
+  tasks:
+    - name: install python2
+      raw: sudo bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal)"
+    - name: install aptitude
+      raw: sudo bash -c "test -e /usr/bin/aptitude || (apt -qqy update && apt install -qy aptitude)"
+
 - name: apply common configuration to all nodes
   hosts: all
 
@@ -11,4 +19,27 @@
 
   roles:
     - git-client
+
+- name: install java on java client nodes
+  hosts: tag_JDK_Yes
+
+  roles:
+    - java-jdk
     
+- name: install java on java client nodes
+  hosts: tag_JRE_Yes
+
+  roles:
+    - java-jre
+
+- name: install node on node client nodes
+  hosts: tag_Node_Yes
+
+  roles:
+    - node
+
+- name: install Swift on Swift client nodes
+  hosts: tag_Swift_Yes
+
+  roles:
+    - swift
