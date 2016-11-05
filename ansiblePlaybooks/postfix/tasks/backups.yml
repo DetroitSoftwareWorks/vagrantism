@@ -1,0 +1,7 @@
+---
+- name: Set backup for postfix
+  lineinfile: 
+    dest: /bak/pathsToBackup
+    state: present 
+    line: '/etc/postfix'
+  become: true
