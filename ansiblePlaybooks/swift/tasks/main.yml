@@ -127,7 +127,10 @@
   become: true
 
 - name: install Swift
-  unarchive: src={{ binaryPath }} remote_src=yes dest=/swift copy=no
+  unarchive:
+    src: {{ binaryPath }}
+    remote_src: yes
+    dest: /swift
   become: true
   when: not swift.stat.exists
 
