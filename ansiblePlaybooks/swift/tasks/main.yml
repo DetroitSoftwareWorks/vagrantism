@@ -128,7 +128,7 @@
 
 - name: install Swift
   unarchive:
-    src: {{ binaryPath }}
+    src: "{{ binaryPath }}"
     remote_src: yes
     dest: /swift
   become: true
