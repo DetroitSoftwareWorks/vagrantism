@@ -10,18 +10,21 @@
   set_fact: 
     MajorVersion: "14"
     MinorVersion: "04"
+    InstallLibCurl: false
   when: '"14.04" in ubuntuVersion'
 
 - name: setURL
   set_fact: 
     MajorVersion: "15"
     MinorVersion: "10"
+    InstallLibCurl: true
   when: '"15.10" in ubuntuVersion'
 
 - name: setURL
   set_fact: 
     MajorVersion: "16"
     MinorVersion: "04"
+    InstallLibCurl: true
   when: '"16.04" in ubuntuVersion'
 
 - name: setURL
@@ -83,7 +86,7 @@
   apt: 
     pkg: libcurl3
     state: latest
-  when: '"15.10" in ubuntuVersion'
+  when: InstallLibCurl == true
   become: true
 
 - name: install required dependencies - clang
