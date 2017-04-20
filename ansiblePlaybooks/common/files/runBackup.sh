@@ -3,8 +3,6 @@
 AWS='/usr/bin/aws'
 BUCKET='backupbotv1'
 
-. /backupbotCredentials.sh
-
 BACKUP_SUBSCRIPTS_DIR='/etc/backups.d'
 BAK_DIR='/bak'
 CRONFILE="${BAK_DIR}/cronfile"
@@ -32,6 +30,7 @@ done
 if [ -e ${PATHS_TO_BACKUP} ]
 then
 	/bin/tar czvf ${PATH_TO_FILE} -T ${PATHS_TO_BACKUP}
+	. /backupbotCredentials.sh
 	ETAG="ETAG"
 	MD5="MD5"
 	MD5_STATUS="SUCCESS"
