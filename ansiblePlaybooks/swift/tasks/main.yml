@@ -135,10 +135,9 @@
   become: true
 
 - name: install Swift
-  unarchive:
-    src: "{{ binaryPath }}"
-    remote_src: yes
-    dest: /swift
+  command: tar xzvf /tmp/swift-binary.tar.gz
+  args:
+    chdir: /swift
   become: true
   when: not swift.stat.exists
 
