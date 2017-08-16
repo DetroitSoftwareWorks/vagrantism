@@ -1,11 +1,27 @@
 ---
+- apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+    state: present
+  become: true
+
+- name: install the apt sources list
+  copy: 
+    backup: true
+    src: ../files/etc-apt-sources.list.d-nodesource.list
+    dest: /etc/apt/sources.list.d/nodesource.list
+    mode: 0644
+    owner: root
+    group: root
+  become: true
+
+- name: update and upgrade all packages
+  apt: 
+    upgrade: safe 
+    update_cache: yes
+  become: true
+
 - name: ensure node is at the latest version
   apt: 
     pkg: nodejs
-    state: latest
-  become: true
-- name: ensure npm is at the latest version
-  apt: 
-    pkg: npm
     state: latest
   become: true
