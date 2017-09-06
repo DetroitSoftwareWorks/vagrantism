@@ -9,7 +9,7 @@ CRONFILE="${BAK_DIR}/cronfile"
 INSTALLED_PKGS_LIST="${BAK_DIR}/installedPackages"
 PATHS_TO_BACKUP="${BAK_DIR}/pathsToBackup"
 FILENAME="$(/bin/date '+%Y%m%d%H%M%S').tgz"
-PATH_TO_FILE="${BAK_DIR}/${TMSTMP}.tgz"
+PATH_TO_FILE="${BAK_DIR}/$(hostname).tgz"
 
 /usr/bin/crontab -l > "${CRONFILE}"
 /usr/bin/aptitude search '~i .*' > "${INSTALLED_PKGS_LIST}"
