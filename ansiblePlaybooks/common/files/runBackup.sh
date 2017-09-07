@@ -10,6 +10,7 @@ INSTALLED_PKGS_LIST="${BAK_DIR}/installedPackages"
 PATHS_TO_BACKUP="${BAK_DIR}/pathsToBackup"
 FILENAME="$(/bin/date '+%Y%m%d%H%M%S').tgz"
 PATH_TO_FILE="${BAK_DIR}/$(hostname).tgz"
+S3_PATH="s3://${BUCKET}/$(hostname)"
 
 /usr/bin/crontab -l > "${CRONFILE}"
 /usr/bin/aptitude search '~i .*' > "${INSTALLED_PKGS_LIST}"
@@ -29,25 +30,29 @@ done
 # This should be kept as last step
 if [ -e ${PATHS_TO_BACKUP} ]
 then
-	/bin/tar czvf ${PATH_TO_FILE} -T ${PATHS_TO_BACKUP}
+	sh -c 'umask 0077 ; /bin/tar czvf '"${PATH_TO_FILE}"' \
+		--preserve-permissions \
+		-T '${PATHS_TO_BACKUP}
+		
 	. /backupbotCredentials.sh
-	ETAG="ETAG"
-	MD5="MD5"
-	MD5_STATUS="SUCCESS"
-	until [  "${MD5_STATUS}" == '0' ]; 
+
+	until [ "${UPLOAD_STATUS}" == '0' ]
 	do
-		"${AWS}" s3 cp "${PATH_TO_FILE}" "s3://${BUCKET}/$(hostname)/${FILENAME}"
+		echo "Uploading ${PATH_TO_FILE} to ${S3_PATH}/${FILENAME}"
+		"${AWS}" s3 cp --region "us-west-1" "${PATH_TO_FILE}" "${S3_PATH}/${FILENAME}"
 		UPLOAD_STATUS="$?"
-		if [ "${UPLOAD_STATUS}" == '0' ]
-		then
-			ETAG=$(${AWS} s3api head-object --bucket "${BUCKET}" --key "$(hostname)/${FILENAME}" | grep ETag | sed -e 's/^.*ETag\": \"\\\"//g' | sed -e 's/\\\"\",.*//g')
-			/bin/echo "${ETAG}  ${PATH_TO_FILE}" > /tmp/ETAG
-			/usr/bin/md5sum --status -c /tmp/ETAG
-			MD5_STATUS="${?}"
-		else
-			echo "Upload failed"
-			exit -1
-		fi
 	done
+	
+	echo "Datestamped file uploaded to S3"
+	UPLOAD_STATUS='1'
+	
+	until [ "${UPLOAD_STATUS}" == '0' ]
+	do
+		"${AWS}" s3 cp --region "us-west-1" "${PATH_TO_FILE}" "${S3_PATH}/latest.tgz"
+		UPLOAD_STATUS="$?"
+	done
+	
+	echo "Latest file uploaded to S3"
+	
 	rm -f "${PATH_TO_FILE}"
 fi
