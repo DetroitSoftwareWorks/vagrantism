@@ -4,7 +4,7 @@
     binaryPath: /tmp/swift-binary.tar.gz
     signaturePath: /tmp/swift-signature.tar.gz.sig
     ubuntuVersion: "{{ ansible_distribution_version }}"
-    releaseName: swift-3.0.1
+    releaseName: swift-4.0
 
 - name: setURL
   set_fact: 
@@ -73,7 +73,7 @@
 
 - name: get key if necessary
   get_url: 
-    url: https://swift.org/keys/release-key-swift-3.x.asc
+    url: https://swift.org/keys/all-keys.asc
     dest: /tmp/swiftkey
   when: not swift.stat.exists and ('"Swift 3.x" not in keyList.stdout')
 
@@ -114,8 +114,9 @@
   when: not swift.stat.exists
 
 - name: refresh key revocation dates
-  shell: /usr/bin/gpg --keyserver hkp://pool.sks-keyservers.net --refresh-keys Swift
+  command: /usr/bin/gpg --keyserver hkp://pool.sks-keyservers.net --refresh-keys Swift
   when: not swift.stat.exists
+  ignore_errors: yes  
   become: true
 
 - name: verify archive
