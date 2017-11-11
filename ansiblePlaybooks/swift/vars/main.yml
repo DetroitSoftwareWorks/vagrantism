@@ -1,0 +1,18 @@
+---
+binaryPath: "/tmp/swift-binary.{{ releaseName }}.tar.gz"
+signaturePath: "/tmp/swift-signature.{{ releaseName }}.tar.gz.sig"
+ubuntuVersion: "{{ ansible_distribution_version }}"
+
+is14: "{{ ubuntuVersion.find('14.04') != -1 }}"
+is15: "{{ ubuntuVersion.find('15.10') != -1 }}"
+is16: "{{ ubuntuVersion.find('16.04') != -1 }}"
+
+MajorVersion: "{{ '14' if is14 else '15' if is15 else '16' }}"
+MinorVersion: "{{ '04' if is14 else '10' if is15 else '04' }}"
+InstallLibCurl: "{{ 'false' if is14 else 'true' }}"
+
+binaryTar: "{{ releaseName }}-RELEASE-ubuntu{{ MajorVersion }}.{{ MinorVersion }}.tar.gz"
+
+binaryURL: "https://swift.org/builds/{{ releaseName }}-release/ubuntu{{ MajorVersion }}{{ MinorVersion }}/{{ releaseName }}-RELEASE/{{ binaryTar }}"
+swiftSystemHome: /swift/{{ releaseName }}-RELEASE-ubuntu{{ MajorVersion }}.{{ MinorVersion }}
+signatureURL: "https://swift.org/builds/{{ releaseName }}-release/ubuntu{{ MajorVersion }}{{ MinorVersion }}/{{ releaseName }}-RELEASE/{{ binaryTar }}.sig"
