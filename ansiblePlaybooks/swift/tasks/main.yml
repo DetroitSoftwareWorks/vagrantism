@@ -1,45 +1,6 @@
 ---
-- name: check OS version
-  set_fact: 
-    binaryPath: /tmp/swift-binary.tar.gz
-    signaturePath: /tmp/swift-signature.tar.gz.sig
-    ubuntuVersion: "{{ ansible_distribution_version }}"
-    releaseName: swift-4.0
-
-- name: setURL
-  set_fact: 
-    MajorVersion: "14"
-    MinorVersion: "04"
-    InstallLibCurl: false
-  when: '"14.04" in ubuntuVersion'
-
-- name: setURL
-  set_fact: 
-    MajorVersion: "15"
-    MinorVersion: "10"
-    InstallLibCurl: true
-  when: '"15.10" in ubuntuVersion'
-
-- name: setURL
-  set_fact: 
-    MajorVersion: "16"
-    MinorVersion: "04"
-    InstallLibCurl: true
-  when: '"16.04" in ubuntuVersion'
-
-- name: setURL
-  set_fact:
-    binaryTar: "{{ releaseName }}-RELEASE-ubuntu{{ MajorVersion }}.{{ MinorVersion }}.tar.gz"
-
-- name: setURL
-  set_fact:
-    binaryURL: "https://swift.org/builds/{{ releaseName }}-release/ubuntu{{ MajorVersion }}{{ MinorVersion }}/{{ releaseName }}-RELEASE/{{ binaryTar }}"
-    swiftSystemHome: /swift/{{ releaseName }}-RELEASE-ubuntu{{ MajorVersion }}.{{ MinorVersion }}
-    signatureURL: "https://swift.org/builds/{{ releaseName }}-release/ubuntu{{ MajorVersion }}{{ MinorVersion }}/{{ releaseName }}-RELEASE/{{ binaryTar }}.sig"
-
 - debug: var={{ ubuntuVersion }}
-- debug: msg="Binary URL is "
-- debug: var="binaryURL"
+- debug: msg="Binary URL is {{ binaryURL }}"
 
 # Per instructions for Linux at https://swift.org/download/#using-downloads
 - name: check if Swift is already here
@@ -136,18 +97,11 @@
   become: true
 
 - name: install Swift
-  command: tar xzvf /tmp/swift-binary.tar.gz
+  command: tar xzvf {{ binaryPath }}
   args:
     chdir: /swift
   become: true
   when: not swift.stat.exists
-
-- name: fix inexplicable swift.org issue
-  file:
-    path: "{{ swiftSystemHome }}/usr/lib/swift/CoreFoundation/"
-    mode: o+r
-    recurse: yes
-  become: true
 
 - name: create link to current swift install
   file:
