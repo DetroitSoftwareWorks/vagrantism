@@ -34,25 +34,28 @@ then
 		--preserve-permissions \
 		-T '${PATHS_TO_BACKUP}
 		
-	. /backupbotCredentials.sh
+	if [ -e /backupbotCredentials.sh ]
+	then
+		. /backupbotCredentials.sh
 
-	until [ "${UPLOAD_STATUS}" == '0' ]
-	do
-		echo "Uploading ${PATH_TO_FILE} to ${S3_PATH}/${FILENAME}"
-		"${AWS}" s3 cp --region "us-west-1" "${PATH_TO_FILE}" "${S3_PATH}/${FILENAME}"
-		UPLOAD_STATUS="$?"
-	done
+		until [ "${UPLOAD_STATUS}" == '0' ]
+		do
+			echo "Uploading ${PATH_TO_FILE} to ${S3_PATH}/${FILENAME}"
+			"${AWS}" s3 cp --region "us-west-1" "${PATH_TO_FILE}" "${S3_PATH}/${FILENAME}"
+			UPLOAD_STATUS="$?"
+		done
 	
-	echo "Datestamped file uploaded to S3"
-	UPLOAD_STATUS='1'
+		echo "Datestamped file uploaded to S3"
+		UPLOAD_STATUS='1'
 	
-	until [ "${UPLOAD_STATUS}" == '0' ]
-	do
-		"${AWS}" s3 cp --region "us-west-1" "${PATH_TO_FILE}" "${S3_PATH}/latest.tgz"
-		UPLOAD_STATUS="$?"
-	done
+		until [ "${UPLOAD_STATUS}" == '0' ]
+		do
+			"${AWS}" s3 cp --region "us-west-1" "${PATH_TO_FILE}" "${S3_PATH}/latest.tgz"
+			UPLOAD_STATUS="$?"
+		done
 	
-	echo "Latest file uploaded to S3"
+		echo "Latest file uploaded to S3"
 	
-	rm -f "${PATH_TO_FILE}"
+		rm -f "${PATH_TO_FILE}"
+	fi
 fi
